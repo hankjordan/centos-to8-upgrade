@@ -11,14 +11,6 @@
 # Backups are your friend, it is entirely possible you will be left with a
 # non-functioning and irrepairable system after this process finishes.
 
-# exit when any command fails
-set -e
-
-# keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-# echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
-
 function info() {
   echo "[$(date)] [info] $1"
 }
@@ -44,6 +36,14 @@ preflight_check "if you are running this on a RHEL-like 7 system" $? "you need t
 
 test -x "$(command -v rsync)" 
 preflight_check "if rsync is installed" $? "you need to install rsync"
+
+# exit when any command fails
+set -e
+
+# keep track of the last executed command
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+# echo an error message before exiting
+trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 if [[ ! -d $STAGING_DIR ]]; then
   mkdir -p $STAGING_DIR
