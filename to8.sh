@@ -37,14 +37,6 @@ preflight_check "if you are running this on a RHEL-like 7 system" $? "you need t
 test -x "$(command -v rsync)" 
 preflight_check "if rsync is installed" $? "you need to install rsync"
 
-# exit when any command fails
-set -e
-
-# keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-# echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
-
 if [[ ! -d $STAGING_DIR ]]; then
   mkdir -p $STAGING_DIR
   for i in `echo dev proc run`; do
@@ -60,6 +52,14 @@ preflight_check "if you have at least 2GB in the staging directory (${STAGING_DI
 echo
 echo "Preflight checks PASSED"
 echo
+
+# exit when any command fails
+set -e
+
+# keep track of the last executed command
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+# echo an error message before exiting
+trap 'echo "\"${last_command}\" command failed with exit code $?."' EXIT
 
 which selinuxenabled 2>/dev/null 1> /dev/null
 
